@@ -1,55 +1,65 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import "./style.css";
 import ContactForm from "./components/ContactForm/ContactForm";
 import Filter from "./components/Filter/Filter";
 import ContactList from "./components/ContactList/ContactList";
 import shortid from "shortid";
+import { connect } from "react-redux";
 
-export default function App() {
-  const [contacts, setContacts] = useState(
-    JSON.parse(window.localStorage.getItem("contacts")) ?? [
-      { id: "id-1", name: "Rosie Simpson", number: "459-12-56" },
-      { id: "id-2", name: "Hermione Kline", number: "443-89-12" },
-      { id: "id-3", name: "Eden Clements", number: "645-17-79" },
-      { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
-    ],
+function App({
+  contacts,
+  filter,
+  handleFilterChange,
+  onAddContact,
+  onRemoveContact,
+}) {
+  const contactFilter = contacts.filter((contact) =>
+    contact.name.toLowerCase().includes(filter.toLowerCase()),
   );
-  const [filter, setFilter] = useState("");
-
-  const handleFilterChange = (event) => {
-    setFilter(event.target.value);
-  };
-
-  const removeContact = (id) => {
-    setContacts((prevState) =>
-      prevState.filter((contact) => contact.id !== id),
-    );
-  };
-
-  const addContact = (name, number) => {
-    const newContact = {
-      id: shortid.generate(),
-      name,
-      number,
-    };
-    setContacts((prevState) => [...prevState, newContact]);
-  };
 
   useEffect(() => {
     window.localStorage.setItem("contacts", JSON.stringify(contacts));
   }, [contacts]);
 
-  const contactFilter = contacts.filter((contact) =>
-    contact.name.toLowerCase().includes(filter.toLowerCase()),
-  );
-
   return (
     <div className='container'>
       <h1>Phoneboock</h1>
-      <ContactForm submit={addContact} contacts={contacts} />
+      <ContactForm contacts={contacts} submit={onAddContact} />
       <h2>Contacts</h2>
       <Filter value={filter} onChange={handleFilterChange} />
-      <ContactList contacts={contactFilter} removeContact={removeContact} />
+      <ContactList contacts={contactFilter} removeContact={onRemoveContact} />
     </div>
   );
 }
+
+const filterChange = (event) => ({
+  type: "contacts/filterChange",
+  value: event.target.value,
+});
+
+const addContact = (name, number) => ({
+  type: "contacts/add",
+  value: {
+    id: shortid.generate(),
+    name,
+    number,
+  },
+});
+
+const removeContact = (id) => ({
+  type: "contacts/remove",
+  value: id,
+});
+
+const mapStateToProps = (state) => ({
+  contacts: state.contacts.items,
+  filter: state.contacts.filter,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  handleFilterChange: (event) => dispatch(filterChange(event)),
+  onAddContact: (name, number) => dispatch(addContact(name, number)),
+  onRemoveContact: (id) => dispatch(removeContact(id)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
