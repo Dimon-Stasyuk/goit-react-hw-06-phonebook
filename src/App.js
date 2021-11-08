@@ -3,7 +3,11 @@ import "./style.css";
 import ContactForm from "./components/ContactForm/ContactForm";
 import Filter from "./components/Filter/Filter";
 import ContactList from "./components/ContactList/ContactList";
-import shortid from "shortid";
+import {
+  filterChange,
+  addContact,
+  removeContact,
+} from "./components/redux/contacts/contacts-actions";
 import { connect } from "react-redux";
 
 function App({
@@ -31,25 +35,6 @@ function App({
     </div>
   );
 }
-
-const filterChange = (event) => ({
-  type: "contacts/filterChange",
-  value: event.target.value,
-});
-
-const addContact = (name, number) => ({
-  type: "contacts/add",
-  value: {
-    id: shortid.generate(),
-    name,
-    number,
-  },
-});
-
-const removeContact = (id) => ({
-  type: "contacts/remove",
-  value: id,
-});
 
 const mapStateToProps = (state) => ({
   contacts: state.contacts.items,
