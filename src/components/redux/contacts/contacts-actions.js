@@ -1,21 +1,14 @@
 import shortid from "shortid";
-import { FILTER_CHANGE, ADD, REMOVE } from "./contacts-types";
+import { createAction } from "@reduxjs/toolkit";
 
-export const filterChange = (event) => ({
-  type: FILTER_CHANGE,
-  value: event.target.value,
-});
+export const filterChange = createAction("contacts/filterChange");
 
-export const addContact = (name, number) => ({
-  type: ADD,
-  value: {
+export const removeContact = createAction("contacts/remove");
+
+export const addContact = createAction("contacts/add", (name, number) => ({
+  payload: {
     id: shortid.generate(),
     name,
     number,
   },
-});
-
-export const removeContact = (id) => ({
-  type: REMOVE,
-  value: id,
-});
+}));

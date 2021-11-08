@@ -42,7 +42,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  handleFilterChange: (event) => dispatch(filterChange(event)),
+  handleFilterChange: (event) => dispatch(filterChange(event.target.value)),
   onAddContact: (name, number) => dispatch(addContact(name, number)),
   onRemoveContact: (id) => dispatch(removeContact(id)),
 });
